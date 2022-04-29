@@ -23,6 +23,8 @@
  *
  * Available properties
  * --------------------
+ * x-alt-desc
+ *   Description of the event capable of displaying HTML.
  * description
  *   String description of the event.
  * dtend
@@ -45,6 +47,7 @@ class ICS {
 
   protected $properties = array();
   private $available_properties = array(
+    'x-alt-desc',
     'description',
     'dtend',
     'dtstart',
@@ -87,7 +90,9 @@ class ICS {
     // Build ICS properties - add header
     $props = array();
     foreach($this->properties as $k => $v) {
-      $props[strtoupper($k . ($k === 'url' ? ';VALUE=URI' : ''))] = $v;
+		if($k == 'x-alt-desc') $v = str_replace(array("\r","\n","\t"), "", $v);
+		elseif($k == 'description') $v = preg_replace('/\<br(\s*)?\/?\>/i', "\n", $v);
+      $props[strtoupper($k . ($k === 'url' ? ';VALUE=URI' : ( $k == 'x-alt-desc' ? ';FMTTYPE=text/html' : '')))] = $v;
     }
 
     // Set some default values
